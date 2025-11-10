@@ -3,14 +3,23 @@ import { supabase } from "../../api/supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function SignUp() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
 
+    // Verificar contraseñas
+    if (password !== confirmPassword) {
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+
+    // Crear usuario en Supabase Auth
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -21,24 +30,40 @@ export default function SignUp() {
       return;
     }
 
-    console.log("Respuesta Supabase:", data);
-
     const user = data?.user ?? data?.session?.user;
 
     if (user) {
-      const { error: insertError } = await supabase.from("profiles").insert([
+      // Insertar en tabla profiles
+      const { error: profileError } = await supabase.from("profiles").insert([
         {
           id: user.id,
           full_name: fullName,
           email,
-          role: "patient", // por defecto, paciente
+          phone,
+          role: "patient", // por defecto paciente
         },
       ]);
 
-      if (insertError) {
-        console.error("Error al insertar en profiles:", insertError.message);
-        alert("Error al crear el perfil: " + insertError.message);
+      if (profileError) {
+        console.error("Error al insertar en profiles:", profileError.message);
+        alert("Error al crear el perfil: " + profileError.message);
         return;
+      }
+
+      // Insertar entrada vacía en patients
+      const { error: patientError } = await supabase.from("patients").insert([
+        {
+          id: user.id,
+          birthdate: null,
+          address: null,
+          observations: null,
+          document: null,
+        },
+      ]);
+
+      if (patientError) {
+        console.error("Error al insertar en patients:", patientError.message);
+        alert("Error al crear detalles del paciente.");
       }
     }
 
@@ -57,6 +82,7 @@ export default function SignUp() {
           onChange={(e) => setFullName(e.target.value)}
           required
         />
+
         <input
           type="email"
           placeholder="Correo electrónico"
@@ -64,6 +90,15 @@ export default function SignUp() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
+        <input
+          type="text"
+          placeholder="Número de teléfono"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+        />
+
         <input
           type="password"
           placeholder="Contraseña"
@@ -71,10 +106,18 @@ export default function SignUp() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        <input
+          type="password"
+          placeholder="Confirmar contraseña"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+
         <button type="submit">Registrarse</button>
       </form>
 
-      {/* 🔹 Enlace para volver al login */}
       <p className="register-link">
         ¿Ya tienes cuenta?{" "}
         <Link to="/signin" className="link">

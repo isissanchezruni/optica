@@ -16,19 +16,24 @@ import Dashboard from "./pages/Dashboard";
 // Admin pages
 import AdminUsers from "./pages/admin/Users";
 import AdminAppointments from "./pages/admin/Appointments";
-import AdminExams from "./pages/admin/Exams";
+import AdminNewAppointment from "./pages/admin/AdminNewAppointment"
+import Exams from "./pages/admin/Exams";
+import CreateExamForm from "./pages/admin/CreateExamForm";
 import AdminReferrals from "./pages/admin/Referrals";
 
-// Specialist pages
+// Especialistas pages
 import SpecialistProfile from "./pages/specialist/Profile";
 import SpecialistAppointments from "./pages/specialist/Appointments";
+import SpecialistNewAppointment from "./pages/specialist/SpecialistNewAppointment"
 import SpecialistExams from "./pages/specialist/Exams";
+import SpecialistCreateExamForm from "./pages/specialist/SpecialistCreateExamForm"
 import SpecialistReferrals from "./pages/specialist/Referrals";
 import SpecialistUsers from "./pages/specialist/Users";
 
-// Patient pages
+// PAciente pages
 import PatientProfile from "./pages/patient/Profile";
-import PatientAppointments from "./pages/patient/Appointments";
+import AppointmentsList from "./pages/patient/AppointmentsList";
+import NewAppointment from "./pages/patient/NewAppointment";
 import PatientExams from "./pages/patient/Exams";
 import PatientReferrals from "./pages/patient/Referrals";
 import PatientGames from "./pages/patient/Games";
@@ -59,7 +64,9 @@ export default function App() {
               <>
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route path="/admin/appointments" element={<AdminAppointments />} />
-                <Route path="/admin/exams" element={<AdminExams />} />
+                <Route path="/admin/new-appointment" element={<AdminNewAppointment />} />
+                <Route path="/admin/exams" element={<Exams />} />
+                <Route path="/admin/create-exam" element={<CreateExamForm />} />
                 <Route path="/admin/referrals" element={<AdminReferrals />} />
                 <Route path="*" element={<Navigate to="/admin/users" replace />} />
               </>
@@ -71,7 +78,9 @@ export default function App() {
                 <Route path="/specialist/profile" element={<SpecialistProfile />} />
                 <Route path="/specialist/appointments" element={<SpecialistAppointments />} />
                 <Route path="/specialist/exams" element={<SpecialistExams />} />
+                <Route path="/specialist/create-exam" element={<SpecialistCreateExamForm />} />
                 <Route path="/specialist/referrals" element={<SpecialistReferrals />} />
+                <Route path="/specialist/new-appointment" element={<SpecialistNewAppointment />} />
                 <Route path="/specialist/users" element={<SpecialistUsers />} />
                 <Route path="*" element={<Navigate to="/specialist/profile" replace />} />
               </>
@@ -81,7 +90,8 @@ export default function App() {
             {profile?.role === "patient" && (
               <>
                 <Route path="/patient/profile" element={<PatientProfile />} />
-                <Route path="/patient/appointments" element={<PatientAppointments />} />
+                <Route path="/patient/appointments" element={<AppointmentsList />} />
+                <Route path="/patient/new-appointment" element={<NewAppointment />} />
                 <Route path="/patient/exams" element={<PatientExams />} />
                 <Route path="/patient/referrals" element={<PatientReferrals />} />
                 <Route path="/patient/games" element={<PatientGames />} />

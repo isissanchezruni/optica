@@ -1,29 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../api/supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function SpecialistExams() {
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const [exams, setExams] = useState([]);
-  const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [editingExam, setEditingExam] = useState(null);
   const [updatedFields, setUpdatedFields] = useState({});
-  const [newExam, setNewExam] = useState({
-    patient_id: "",
-    scheduled_at: "",
-    observations: "",
-  });
 
   useEffect(() => {
-    if (profile?.id) {
-      fetchExams();
-      fetchPatients();
-    }
+    if (profile?.id) fetchExams();
   }, [profile, filter]);
 
-  // 🔹 Obtener exámenes del especialista logueado
   const fetchExams = async () => {
     setLoading(true);
     let query = supabase
@@ -46,7 +38,6 @@ export default function SpecialistExams() {
     if (filter === "pending") query = query.eq("performed", false);
 
     const { data, error } = await query;
-
     if (error) {
       console.error("Error al obtener exámenes:", error);
       alert("No se pudieron cargar los exámenes");
@@ -56,46 +47,37 @@ export default function SpecialistExams() {
     setLoading(false);
   };
 
-  // 🔹 Obtener pacientes
-  const fetchPatients = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("role", "patient");
+  const handleSave = async (examId) => {
+    const fields = updatedFields[examId];
+    if (!fields) return;
 
-    if (error) console.error("Error al cargar pacientes:", error);
-    else setPatients(data || []);
-  };
-
-  // 🔹 Crear examen nuevo
-  const createExam = async (e) => {
-    e.preventDefault();
-    if (!newExam.patient_id || !newExam.scheduled_at) {
-      alert("Selecciona un paciente y una fecha");
-      return;
-    }
-
-    const { error } = await supabase.from("exams").insert([
-      {
-        patient_id: newExam.patient_id,
-        scheduled_at: newExam.scheduled_at,
-        observations: newExam.observations,
-        specialist_role: profile.role,
-        created_by: profile.id,
-      },
-    ]);
-
+    const { error } = await supabase.from("exams").update(fields).eq("id", examId);
     if (error) {
       console.error(error);
-      alert("Error al crear examen");
+      alert("Error al guardar cambios");
     } else {
-      alert("Examen creado correctamente");
-      setNewExam({ patient_id: "", scheduled_at: "", observations: "" });
+      alert("Cambios guardados correctamente");
+      setEditingExam(null);
+      setUpdatedFields((prev) => {
+        const copy = { ...prev };
+        delete copy[examId];
+        return copy;
+      });
       fetchExams();
     }
   };
 
-  // 🔹 Subir archivo PDF
+  const togglePerformed = async (exam) => {
+    const { error } = await supabase
+      .from("exams")
+      .update({ performed: !exam.performed })
+      .eq("id", exam.id);
+    if (error) {
+      console.error(error);
+      alert("Error al actualizar estado");
+    } else fetchExams();
+  };
+
   const uploadFile = async (examId, file) => {
     if (!file) return;
     const filePath = `exams/${examId}/${file.name}`;
@@ -119,104 +101,50 @@ export default function SpecialistExams() {
     fetchExams();
   };
 
-  // 🔹 Guardar cambios
-  const handleSave = async (examId) => {
-    const fields = updatedFields[examId];
-    if (!fields) return;
-
-    const { error } = await supabase.from("exams").update(fields).eq("id", examId);
-    if (error) {
-      console.error(error);
-      alert("Error al guardar cambios");
-    } else {
-      alert("Cambios guardados correctamente");
-      setEditingExam(null);
-      setUpdatedFields((prev) => {
-        const copy = { ...prev };
-        delete copy[examId];
-        return copy;
-      });
-      fetchExams();
-    }
-  };
-
-  // 🔹 Alternar estado realizado
-  const togglePerformed = async (exam) => {
-    const { error } = await supabase
-      .from("exams")
-      .update({ performed: !exam.performed })
-      .eq("id", exam.id);
-    if (error) {
-      console.error(error);
-      alert("Error al actualizar estado");
-    } else fetchExams();
-  };
-
   const getPublicUrl = (path) => {
     if (!path) return null;
     const { data } = supabase.storage.from("exams-pdfs").getPublicUrl(path);
     return data?.publicUrl || null;
   };
 
+  const handleNewExam = () => {
+  navigate("/specialist/create-exam");
+};
+
   return (
     <div>
-      <h2 style={{ fontSize: "1.8rem", marginBottom: "1rem" }}>
-        Exámenes ({profile.role === "optometrist" ? "Optometrista" : "Ortoptista"})
-      </h2>
+      {/* 🔹 Encabezado */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <div>
+          <label style={{ fontWeight: 600, marginRight: "8px" }}>Filtrar por estado:</label>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            style={{ padding: "6px 10px", borderRadius: "6px" }}
+          >
+            <option value="all">Todos</option>
+            <option value="pending">Pendientes</option>
+            <option value="done">Realizados</option>
+          </select>
+        </div>
 
-      {/* 🔹 Filtro */}
-      <div style={{ marginBottom: "1rem" }}>
-        <label style={{ fontWeight: 600, marginRight: "8px" }}>Filtrar por estado:</label>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          style={{ padding: "6px 10px", borderRadius: "6px" }}
+        <button
+          onClick={handleNewExam}
+          style={{
+            background: "#2563eb",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 14px",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
         >
-          <option value="all">Todos</option>
-          <option value="pending">Pendientes</option>
-          <option value="done">Realizados</option>
-        </select>
+          ➕ Nuevo examen
+        </button>
       </div>
 
-      {/* 🔹 Formulario crear examen */}
-      <form onSubmit={createExam} className="card" style={{ marginBottom: "2rem", maxWidth: 600 }}>
-        <h3>Crear nuevo examen</h3>
-        <label>Paciente:</label>
-        <select
-          value={newExam.patient_id}
-          onChange={(e) => setNewExam({ ...newExam, patient_id: e.target.value })}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        >
-          <option value="">-- Selecciona paciente --</option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.full_name}
-            </option>
-          ))}
-        </select>
-
-        <label>Fecha programada:</label>
-        <input
-          type="datetime-local"
-          value={newExam.scheduled_at}
-          onChange={(e) => setNewExam({ ...newExam, scheduled_at: e.target.value })}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        />
-
-        <label>Observaciones iniciales:</label>
-        <textarea
-          value={newExam.observations}
-          onChange={(e) => setNewExam({ ...newExam, observations: e.target.value })}
-          rows="3"
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        />
-
-        <button className="save-btn" type="submit">
-          ➕ Crear examen
-        </button>
-      </form>
-
-      {/* 🔹 Tabla de exámenes */}
+      {/* 🔹 Tabla */}
       <div className="card">
         {loading ? (
           <p>Cargando...</p>

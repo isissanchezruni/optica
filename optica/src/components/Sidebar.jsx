@@ -25,7 +25,7 @@ const Sidebar = ({ role }) => {
       ? [
           { label: "Users / Patients", icon: <FaUsersCog />, path: "/admin/users" },
           { label: "Appointments", icon: <FaCalendarAlt />, path: "/admin/appointments" },
-          { label: "Exams", icon: <FaFileAlt />, path: "/admin/exams" },
+          { label: "Exams", icon: <FaFileAlt />, path: "/admin/Exams" },
           { label: "Referrals", icon: <FaStethoscope />, path: "/admin/referrals" },
         ]
       : role === "optometrist" || role === "ortoptist"

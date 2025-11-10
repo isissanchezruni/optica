@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../api/supabaseClient";
+import { useNavigate } from "react-router-dom";
+import CreateExamForm from "./CreateExamForm"
 
 export default function AdminExams() {
   const [exams, setExams] = useState([]);
-  const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterState, setFilterState] = useState("all");
   const [filterRole, setFilterRole] = useState("all");
   const [editingExam, setEditingExam] = useState(null);
   const [updatedFields, setUpdatedFields] = useState({});
-  const [newExam, setNewExam] = useState({
-    patient_id: "",
-    scheduled_at: "",
-    observations: "",
-    specialist_role: "optometrist",
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchExams();
-    fetchPatients();
   }, [filterState, filterRole]);
 
-  // 🔹 Cargar exámenes
   const fetchExams = async () => {
     setLoading(true);
     let query = supabase
@@ -50,54 +44,21 @@ export default function AdminExams() {
     setLoading(false);
   };
 
-  // 🔹 Cargar pacientes
-  const fetchPatients = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("role", "patient");
+  const getPublicUrl = (path) => {
+    if (!path) return null;
+    const { data } = supabase.storage.from("exams-pdfs").getPublicUrl(path);
+    return data?.publicUrl || null;
+  };
+
+  const togglePerformed = async (exam) => {
+    const { error } = await supabase
+      .from("exams")
+      .update({ performed: !exam.performed })
+      .eq("id", exam.id);
     if (error) console.error(error);
-    else setPatients(data || []);
+    else fetchExams();
   };
 
-  // 🔹 Crear nuevo examen
-  const createExam = async (e) => {
-    e.preventDefault();
-    if (!newExam.patient_id || !newExam.scheduled_at) {
-      alert("Selecciona un paciente y una fecha");
-      return;
-    }
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const { error } = await supabase.from("exams").insert([
-      {
-        patient_id: newExam.patient_id,
-        scheduled_at: newExam.scheduled_at,
-        observations: newExam.observations,
-        specialist_role: newExam.specialist_role,
-        created_by: user.id,
-      },
-    ]);
-
-    if (error) {
-      console.error(error);
-      alert("Error al crear examen");
-    } else {
-      alert("Examen creado correctamente");
-      setNewExam({
-        patient_id: "",
-        scheduled_at: "",
-        observations: "",
-        specialist_role: "optometrist",
-      });
-      fetchExams();
-    }
-  };
-
-  // 🔹 Subir archivo PDF
   const uploadFile = async (examId, file) => {
     if (!file) return;
     const filePath = `exams/${examId}/${file.name}`;
@@ -121,7 +82,6 @@ export default function AdminExams() {
     fetchExams();
   };
 
-  // 🔹 Guardar edición
   const handleSave = async (examId) => {
     const fields = updatedFields[examId];
     if (!fields) return;
@@ -142,7 +102,6 @@ export default function AdminExams() {
     }
   };
 
-  // 🔹 Eliminar examen
   const deleteExam = async (id) => {
     if (!window.confirm("¿Seguro que deseas eliminar este examen?")) return;
     const { error } = await supabase.from("exams").delete().eq("id", id);
@@ -155,25 +114,25 @@ export default function AdminExams() {
     }
   };
 
-  // 🔹 Alternar estado realizado
-  const togglePerformed = async (exam) => {
-    const { error } = await supabase
-      .from("exams")
-      .update({ performed: !exam.performed })
-      .eq("id", exam.id);
-    if (error) console.error(error);
-    else fetchExams();
-  };
-
-  const getPublicUrl = (path) => {
-    if (!path) return null;
-    const { data } = supabase.storage.from("exams-pdfs").getPublicUrl(path);
-    return data?.publicUrl || null;
-  };
-
   return (
     <div>
       <h2 style={{ fontSize: "1.8rem", marginBottom: "1rem" }}>Gestión de Exámenes</h2>
+
+      {/* 🔹 Botón para crear nuevo examen */}
+      <button
+        onClick={() => navigate("/admin/create-exam")}
+        style={{
+          backgroundColor: "#2563eb",
+          color: "white",
+          padding: "10px 16px",
+          borderRadius: "6px",
+          border: "none",
+          cursor: "pointer",
+          marginBottom: "1rem",
+        }}
+      >
+        ➕ Crear nuevo examen
+      </button>
 
       {/* 🔹 Filtros */}
       <div style={{ marginBottom: "1rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
@@ -203,58 +162,6 @@ export default function AdminExams() {
           </select>
         </div>
       </div>
-
-      {/* 🔹 Crear examen */}
-      <form
-        onSubmit={createExam}
-        className="card"
-        style={{ marginBottom: "2rem", maxWidth: 700 }}
-      >
-        <h3>Crear nuevo examen</h3>
-        <label>Paciente:</label>
-        <select
-          value={newExam.patient_id}
-          onChange={(e) => setNewExam({ ...newExam, patient_id: e.target.value })}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        >
-          <option value="">-- Selecciona paciente --</option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.full_name}
-            </option>
-          ))}
-        </select>
-
-        <label>Especialista:</label>
-        <select
-          value={newExam.specialist_role}
-          onChange={(e) => setNewExam({ ...newExam, specialist_role: e.target.value })}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        >
-          <option value="optometrist">Optometrista</option>
-          <option value="ortoptist">Ortoptista</option>
-        </select>
-
-        <label>Fecha programada:</label>
-        <input
-          type="datetime-local"
-          value={newExam.scheduled_at}
-          onChange={(e) => setNewExam({ ...newExam, scheduled_at: e.target.value })}
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        />
-
-        <label>Observaciones iniciales:</label>
-        <textarea
-          value={newExam.observations}
-          onChange={(e) => setNewExam({ ...newExam, observations: e.target.value })}
-          rows="3"
-          style={{ width: "100%", padding: "8px", marginBottom: "8px" }}
-        />
-
-        <button className="save-btn" type="submit">
-          ➕ Crear examen
-        </button>
-      </form>
 
       {/* 🔹 Tabla */}
       <div className="card">

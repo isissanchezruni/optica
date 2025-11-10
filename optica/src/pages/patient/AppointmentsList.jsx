@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../api/supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
-export default function PatientAppointments() {
+export default function AppointmentsList() {
   const { profile } = useAuth();
   const [appointments, setAppointments] = useState([]);
-  const [newAppointment, setNewAppointment] = useState({
-    specialist_role: "optometrist",
-    scheduled_at: "",
-  });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (profile?.id) fetchAppointments();
@@ -32,29 +30,6 @@ export default function PatientAppointments() {
     setLoading(false);
   };
 
-  const createAppointment = async (e) => {
-    e.preventDefault();
-    if (!newAppointment.scheduled_at) return alert("Selecciona una fecha y hora");
-
-    const { error } = await supabase.from("appointments").insert([
-      {
-        patient_id: profile.id,
-        specialist_role: newAppointment.specialist_role,
-        scheduled_at: newAppointment.scheduled_at,
-        created_by: profile.id,
-      },
-    ]);
-
-    if (error) {
-      console.error(error);
-      alert("Error al crear la cita");
-    } else {
-      alert("Cita creada correctamente");
-      setNewAppointment({ specialist_role: "optometrist", scheduled_at: "" });
-      fetchAppointments();
-    }
-  };
-
   const cancelAppointment = async (id) => {
     const { error } = await supabase
       .from("appointments")
@@ -71,46 +46,17 @@ export default function PatientAppointments() {
 
   return (
     <div>
-      <h2 style={{ fontSize: "1.8rem", marginBottom: "1rem" }}>Mis Citas</h2>
-
-      {/* Crear nueva cita */}
-      <form
-        onSubmit={createAppointment}
+      <div
         style={{
-          background: "white",
-          padding: "1.5rem",
-          borderRadius: "12px",
-          marginBottom: "2rem",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-          maxWidth: 500,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.5rem",
         }}
       >
-        <h3>Agendar nueva cita</h3>
-
-        <label>Tipo de especialista:</label>
-        <select
-          value={newAppointment.specialist_role}
-          onChange={(e) =>
-            setNewAppointment({ ...newAppointment, specialist_role: e.target.value })
-          }
-          style={{ display: "block", margin: "0.5rem 0", width: "100%", padding: "8px" }}
-        >
-          <option value="optometrist">Optometrista</option>
-          <option value="ortoptist">Ortoptista</option>
-        </select>
-
-        <label>Fecha y hora:</label>
-        <input
-          type="datetime-local"
-          value={newAppointment.scheduled_at}
-          onChange={(e) =>
-            setNewAppointment({ ...newAppointment, scheduled_at: e.target.value })
-          }
-          style={{ display: "block", margin: "0.5rem 0 1rem 0", width: "100%", padding: "8px" }}
-        />
-
+        <h2 style={{ fontSize: "1.8rem" }}>Mis Citas</h2>
         <button
-          type="submit"
+          onClick={() => navigate("/patient/new-appointment")}
           style={{
             background: "#007bff",
             color: "white",
@@ -120,19 +66,30 @@ export default function PatientAppointments() {
             cursor: "pointer",
           }}
         >
-          Crear cita
+          + Agendar nueva cita
         </button>
-      </form>
+      </div>
 
-      {/* Listado de citas */}
-      <div style={{ background: "white", padding: "1.5rem", borderRadius: "12px" }}>
-        <h3>Historial de citas</h3>
+      <div
+        style={{
+          background: "white",
+          padding: "1.5rem",
+          borderRadius: "12px",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+        }}
+      >
         {loading ? (
           <p>Cargando...</p>
         ) : appointments.length === 0 ? (
           <p>No tienes citas registradas.</p>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "1rem" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginTop: "1rem",
+            }}
+          >
             <thead>
               <tr style={{ background: "#f0f4ff", textAlign: "left" }}>
                 <th>Fecha</th>
