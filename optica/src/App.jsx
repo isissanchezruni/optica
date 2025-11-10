@@ -3,6 +3,10 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
 
+// ⚙️ Ajustes globales
+import { SettingsProvider } from "./context/SettingsContext";
+import SettingsBubble from "./components/SettingsBubble";
+
 // Auth
 import SignIn from "./components/Auth/SignIn";
 import SignUp from "./components/Auth/SignUp";
@@ -45,6 +49,7 @@ export default function App() {
   if (loading) return <div style={{ padding: 40 }}>Cargando autenticación...</div>;
 
   return (
+  <SettingsProvider> 
     <BrowserRouter>
       <Routes>
         {/* Rutas públicas */}
@@ -104,5 +109,8 @@ export default function App() {
         )}
       </Routes>
     </BrowserRouter>
+
+     <SettingsBubble />
+    </SettingsProvider>
   );
 }

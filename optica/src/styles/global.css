@@ -745,3 +745,24 @@ select {
   padding: 6px 10px;
   text-transform: capitalize;
 }
+
+/* === Modo oscuro === */
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+body.dark-mode .card,
+body.dark-mode table,
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+  border-color: #444;
+}
+
+body.dark-mode button {
+  background-color: #444;
+  color: white;
+}

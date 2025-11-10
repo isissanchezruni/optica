@@ -23,27 +23,27 @@ const Sidebar = ({ role }) => {
   const menuItems =
     role === "admin"
       ? [
-          { label: "Users / Patients", icon: <FaUsersCog />, path: "/admin/users" },
-          { label: "Appointments", icon: <FaCalendarAlt />, path: "/admin/appointments" },
-          { label: "Exams", icon: <FaFileAlt />, path: "/admin/Exams" },
-          { label: "Referrals", icon: <FaStethoscope />, path: "/admin/referrals" },
+          { label: "Usuarios / Pacientes", icon: <FaUsersCog />, path: "/admin/users" },
+          { label: "Citas", icon: <FaCalendarAlt />, path: "/admin/appointments" },
+          { label: "Examenes", icon: <FaFileAlt />, path: "/admin/Exams" },
+          { label: "Remisiones", icon: <FaStethoscope />, path: "/admin/referrals" },
         ]
       : role === "optometrist" || role === "ortoptist"
       ? [
           
-          { label: "Appointments", icon: <FaCalendarAlt />, path: "/specialist/appointments" },
-          { label: "Exams", icon: <FaFileAlt />, path: "/specialist/exams" },
-          { label: "Referrals", icon: <FaStethoscope />, path: "/specialist/referrals" },
-          { label: "Users", icon: <FaStethoscope />, path: "/specialist/users" },
-          { label: "My Profile", icon: <FaUser />, path: "/specialist/profile" },
+          { label: "Citas", icon: <FaCalendarAlt />, path: "/specialist/appointments" },
+          { label: "Examenes", icon: <FaFileAlt />, path: "/specialist/exams" },
+          { label: "Remisiones", icon: <FaStethoscope />, path: "/specialist/referrals" },
+          { label: "Usuarios", icon: <FaStethoscope />, path: "/specialist/users" },
+          { label: "Mi perfil", icon: <FaUser />, path: "/specialist/profile" },
         ]
       : [
           
-          { label: "My Appointments", icon: <FaCalendarAlt />, path: "/patient/appointments" },
-          { label: "Exams", icon: <FaFileAlt />, path: "/patient/exams" },
-          { label: "Referrals", icon: <FaStethoscope />, path: "/patient/referrals" },
-          { label: "Games", icon: <FaGamepad />, path: "/patient/games" },
-          { label: "My Profile", icon: <FaUser />, path: "/patient/profile" },
+          { label: "Mis Citas", icon: <FaCalendarAlt />, path: "/patient/appointments" },
+          { label: "Mis Examenes", icon: <FaFileAlt />, path: "/patient/exams" },
+          { label: "Mis Remisiones", icon: <FaStethoscope />, path: "/patient/referrals" },
+          { label: "Juegos", icon: <FaGamepad />, path: "/patient/games" },
+          { label: "Mi Prerfi", icon: <FaUser />, path: "/patient/profile" },
         ];
 
   return (
@@ -71,7 +71,7 @@ const Sidebar = ({ role }) => {
 
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-btn">
-          <FaSignOutAlt /> Log out
+          <FaSignOutAlt /> Cerrar Sesion
         </button>
       </div>
     </div>

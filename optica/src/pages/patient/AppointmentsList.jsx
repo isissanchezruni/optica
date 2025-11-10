@@ -14,33 +14,55 @@ export default function AppointmentsList() {
   }, [profile]);
 
   const fetchAppointments = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("appointments")
-      .select(`
-        id, scheduled_at, status, specialist_role, 
-        created_at, specialist_id, 
-        profiles!appointments_specialist_id_fkey(full_name)
-      `)
-      .eq("patient_id", profile.id)
-      .order("scheduled_at", { ascending: false });
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+          id,
+          scheduled_at,
+          status,
+          specialist_role,
+          created_at,
+          specialist_id,
+          profiles!appointments_specialist_id_fkey(full_name)
+        `)
+        .eq("patient_id", profile.id)
+        .order("scheduled_at", { ascending: false });
 
-    if (error) console.error(error);
-    else setAppointments(data || []);
-    setLoading(false);
+      if (error) throw error;
+      setAppointments(data || []);
+    } catch (err) {
+      console.error("Error al cargar citas:", err.message);
+      alert("Error al cargar las citas. Verifica tu conexión o permisos.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const cancelAppointment = async (id) => {
-    const { error } = await supabase
-      .from("appointments")
-      .update({ status: "canceled" })
-      .eq("id", id);
+    if (!window.confirm("¿Seguro que deseas cancelar esta cita?")) return;
 
-    if (error) {
-      console.error(error);
-      alert("No se pudo cancelar la cita");
-    } else {
+    try {
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "canceled" })
+        .eq("id", id)
+        .eq("patient_id", profile.id); // <- asegura que solo pueda cancelar sus citas
+
+      if (error) throw error;
+
+      alert("La cita ha sido cancelada correctamente.");
       fetchAppointments();
+    } catch (err) {
+      console.error("Error al cancelar cita:", err.message);
+      if (err.message.includes("RLS")) {
+        alert(
+          "No tienes permisos para cancelar esta cita. Verifica la política RLS en Supabase."
+        );
+      } else {
+        alert("No se pudo cancelar la cita. Inténtalo nuevamente.");
+      }
     }
   };
 
