@@ -28,6 +28,7 @@ import SpecialistNewAppointment from "./pages/specialist/SpecialistNewAppointmen
 import SpecialistExams from "./pages/specialist/Exams";
 import SpecialistCreateExamForm from "./pages/specialist/SpecialistCreateExamForm"
 import SpecialistReferrals from "./pages/specialist/Referrals";
+import SpecialistCreateReferral from "./pages/specialist/SpecialistCreateReferral";
 import SpecialistUsers from "./pages/specialist/Users";
 
 // PAciente pages
@@ -36,7 +37,7 @@ import AppointmentsList from "./pages/patient/AppointmentsList";
 import NewAppointment from "./pages/patient/NewAppointment";
 import PatientExams from "./pages/patient/Exams";
 import PatientReferrals from "./pages/patient/Referrals";
-import PatientGames from "./pages/patient/Games";
+import PatientGames from "./pages/patient/Games/Games";
 
 export default function App() {
   const { session, profile, loading } = useAuth();
@@ -80,6 +81,7 @@ export default function App() {
                 <Route path="/specialist/exams" element={<SpecialistExams />} />
                 <Route path="/specialist/create-exam" element={<SpecialistCreateExamForm />} />
                 <Route path="/specialist/referrals" element={<SpecialistReferrals />} />
+                <Route path="/specialist/referrals/new" element={<SpecialistCreateReferral />} />
                 <Route path="/specialist/new-appointment" element={<SpecialistNewAppointment />} />
                 <Route path="/specialist/users" element={<SpecialistUsers />} />
                 <Route path="*" element={<Navigate to="/specialist/profile" replace />} />

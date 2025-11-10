@@ -30,18 +30,20 @@ const Sidebar = ({ role }) => {
         ]
       : role === "optometrist" || role === "ortoptist"
       ? [
-          { label: "My Profile", icon: <FaUser />, path: "/specialist/profile" },
+          
           { label: "Appointments", icon: <FaCalendarAlt />, path: "/specialist/appointments" },
           { label: "Exams", icon: <FaFileAlt />, path: "/specialist/exams" },
           { label: "Referrals", icon: <FaStethoscope />, path: "/specialist/referrals" },
           { label: "Users", icon: <FaStethoscope />, path: "/specialist/users" },
+          { label: "My Profile", icon: <FaUser />, path: "/specialist/profile" },
         ]
       : [
-          { label: "My Profile", icon: <FaUser />, path: "/patient/profile" },
+          
           { label: "My Appointments", icon: <FaCalendarAlt />, path: "/patient/appointments" },
           { label: "Exams", icon: <FaFileAlt />, path: "/patient/exams" },
           { label: "Referrals", icon: <FaStethoscope />, path: "/patient/referrals" },
           { label: "Games", icon: <FaGamepad />, path: "/patient/games" },
+          { label: "My Profile", icon: <FaUser />, path: "/patient/profile" },
         ];
 
   return (
