@@ -3,18 +3,16 @@ import React from "react";
 import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import "../styles/Layout.css"; // opcional: tus estilos
+import "../styles/Layout.css";
 
 export default function DashboardLayout() {
   const { profile } = useAuth();
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* Sidebar fija - le pasamos role */}
+    <div className="layout-container">
       <Sidebar role={profile?.role} />
 
-      {/* Contenido */}
-      <main style={{ flex: 1, padding: "32px", background: "#f6f8fc" }}>
+      <main className="layout-content">
         <Outlet />
       </main>
     </div>

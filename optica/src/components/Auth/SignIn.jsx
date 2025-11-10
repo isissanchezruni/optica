@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { supabase } from "../../api/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-const SignIn = () => {
+export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -10,7 +10,6 @@ const SignIn = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
 
-    // Iniciar sesión
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -27,7 +26,7 @@ const SignIn = () => {
       return;
     }
 
-    // Obtener el rol desde la tabla profiles
+    // 🔹 Obtener rol del perfil
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
@@ -39,9 +38,11 @@ const SignIn = () => {
       return;
     }
 
-    // Redirigir según el rol
+    // 🔹 Redirección según rol
     if (profile.role === "admin") {
       navigate("/admin");
+    } else if (profile.role === "optometrist" || profile.role === "ortoptist") {
+      navigate("/specialist");
     } else {
       navigate("/dashboard");
     }
@@ -67,8 +68,14 @@ const SignIn = () => {
         />
         <button type="submit">Entrar</button>
       </form>
+
+      {/* 🔹 Enlace de registro */}
+      <p className="register-link">
+        ¿No tienes cuenta?{" "}
+        <Link to="/signup" className="link">
+          Regístrate aquí
+        </Link>
+      </p>
     </div>
   );
-};
-
-export default SignIn;
+}

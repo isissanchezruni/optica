@@ -1,8 +1,7 @@
-// src/pages/admin/Users.jsx
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../api/supabaseClient";
 
-export default function AdminUsers() {
+export default function SpecialistUsers() {
   const [users, setUsers] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +24,7 @@ export default function AdminUsers() {
     fetchUsers();
   }, []);
 
-  // 🔹 Trae todos los usuarios con datos de pacientes
+  // 🔹 Trae solo pacientes
   async function fetchUsers() {
     const { data, error } = await supabase
       .from("profiles")
@@ -41,7 +40,8 @@ export default function AdminUsers() {
           document,
           observations
         )
-      `);
+      `)
+      .eq("role", "patient");
 
     if (error) console.error(error);
     else {
@@ -61,34 +61,11 @@ export default function AdminUsers() {
     setLoading(false);
   }
 
-  async function handleEdit(id) {
+  function handleEdit(id) {
     const user = users.find((u) => u.id === id);
     if (user) {
       setSelected(id);
       setForm(user);
-    }
-  }
-
-  async function handleDelete(id) {
-    if (!window.confirm("¿Seguro que deseas eliminar este paciente?")) return;
-
-    const { error: patientErr } = await supabase
-      .from("patients")
-      .delete()
-      .eq("id", id);
-
-    const { error: profileErr } = await supabase
-      .from("profiles")
-      .delete()
-      .eq("id", id);
-
-    if (patientErr || profileErr) {
-      console.error(patientErr || profileErr);
-      alert("Error al eliminar paciente");
-    } else {
-      alert("Paciente eliminado correctamente");
-      fetchUsers();
-      setSelected(null); // 🔹 Cierra el formulario si estaba abierto
     }
   }
 
@@ -99,26 +76,18 @@ export default function AdminUsers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selected) return;
     setSaving(true);
 
-    if (!selected) {
-      alert("Selecciona un paciente para editar");
-      setSaving(false);
-      return;
-    }
-
-    // 🔹 Actualizar profile
     const { error: profileErr } = await supabase
       .from("profiles")
       .update({
         full_name: form.full_name,
         email: form.email,
         phone: form.phone,
-        role: form.role,
       })
       .eq("id", selected);
 
-    // 🔹 Actualizar paciente
     const { error: patientErr } = await supabase
       .from("patients")
       .upsert(
@@ -136,23 +105,20 @@ export default function AdminUsers() {
       console.error(profileErr || patientErr);
       alert("Error al actualizar paciente");
     } else {
-      alert("✅ Paciente actualizado correctamente");
-      setSelected(null); // 🔹 Cierra el panel de edición
-      setForm(emptyUser);
+      alert("Paciente actualizado correctamente");
+      setSelected(null); // 🔹 Cierra la edición al guardar
       fetchUsers();
     }
 
     setSaving(false);
   };
 
-  if (loading) return <p>Cargando usuarios...</p>;
+  if (loading) return <p>Cargando pacientes...</p>;
 
   return (
     <div className="admin-users-container">
       <div className="users-list">
-        <div className="list-header">
-          <h2>Usuarios registrados</h2>
-        </div>
+        <h2>Pacientes registrados</h2>
 
         <ul>
           {users.map((u) => (
@@ -161,19 +127,8 @@ export default function AdminUsers() {
               onClick={() => handleEdit(u.id)}
               className={selected === u.id ? "selected" : ""}
             >
-              <div>
-                <strong>{u.full_name || "Sin nombre"}</strong>
-                <span> ({u.role})</span>
-              </div>
-              <button
-                className="btn-delete"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(u.id);
-                }}
-              >
-                🗑️
-              </button>
+              <strong>{u.full_name || "Sin nombre"}</strong>
+              <span>({u.role})</span>
             </li>
           ))}
         </ul>
@@ -211,21 +166,13 @@ export default function AdminUsers() {
                 placeholder="Ej: +57 312 345 6789"
               />
 
-              <label>Rol</label>
-              <select name="role" value={form.role} onChange={handleChange}>
-                <option value="patient">Paciente</option>
-                <option value="optometrist">Optometrista</option>
-                <option value="ortoptist">Ortoptista</option>
-                <option value="admin">Administrador</option>
-              </select>
-
-              <label>Documento de identidad</label>
+              <label>Documento</label>
               <input
                 type="text"
                 name="document"
                 value={form.document}
                 onChange={handleChange}
-                placeholder="Ej: 1002456789"
+                placeholder="Cédula o documento de identidad"
               />
 
               <label>Fecha de nacimiento</label>
@@ -250,26 +197,17 @@ export default function AdminUsers() {
                 name="observations"
                 value={form.observations}
                 onChange={handleChange}
-                placeholder="Notas o comentarios del paciente"
+                placeholder="Notas adicionales sobre el paciente"
                 rows="3"
               />
 
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={() => setSelected(null)}
-                >
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-save" disabled={saving}>
-                  {saving ? "Guardando..." : "Actualizar paciente"}
-                </button>
-              </div>
+              <button type="submit" className="btn-save" disabled={saving}>
+                {saving ? "Guardando..." : "Actualizar paciente"}
+              </button>
             </form>
           </>
         ) : (
-          <p>Selecciona un paciente para editar sus datos</p>
+          <p>Selecciona un paciente para editar</p>
         )}
       </div>
     </div>

@@ -34,6 +34,7 @@ const Sidebar = ({ role }) => {
           { label: "Appointments", icon: <FaCalendarAlt />, path: "/specialist/appointments" },
           { label: "Exams", icon: <FaFileAlt />, path: "/specialist/exams" },
           { label: "Referrals", icon: <FaStethoscope />, path: "/specialist/referrals" },
+          { label: "Users", icon: <FaStethoscope />, path: "/specialist/users" },
         ]
       : [
           { label: "My Profile", icon: <FaUser />, path: "/patient/profile" },

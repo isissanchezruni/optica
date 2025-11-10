@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { supabase } from "../../api/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-const SignUp = () => {
+export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -31,7 +31,7 @@ const SignUp = () => {
           id: user.id,
           full_name: fullName,
           email,
-          role: "patient",
+          role: "patient", // por defecto, paciente
         },
       ]);
 
@@ -73,8 +73,14 @@ const SignUp = () => {
         />
         <button type="submit">Registrarse</button>
       </form>
+
+      {/* 🔹 Enlace para volver al login */}
+      <p className="register-link">
+        ¿Ya tienes cuenta?{" "}
+        <Link to="/signin" className="link">
+          Inicia sesión aquí
+        </Link>
+      </p>
     </div>
   );
-};
-
-export default SignUp;
+}

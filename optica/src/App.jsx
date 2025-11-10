@@ -24,6 +24,7 @@ import SpecialistProfile from "./pages/specialist/Profile";
 import SpecialistAppointments from "./pages/specialist/Appointments";
 import SpecialistExams from "./pages/specialist/Exams";
 import SpecialistReferrals from "./pages/specialist/Referrals";
+import SpecialistUsers from "./pages/specialist/Users";
 
 // Patient pages
 import PatientProfile from "./pages/patient/Profile";
@@ -71,6 +72,7 @@ export default function App() {
                 <Route path="/specialist/appointments" element={<SpecialistAppointments />} />
                 <Route path="/specialist/exams" element={<SpecialistExams />} />
                 <Route path="/specialist/referrals" element={<SpecialistReferrals />} />
+                <Route path="/specialist/users" element={<SpecialistUsers />} />
                 <Route path="*" element={<Navigate to="/specialist/profile" replace />} />
               </>
             )}

@@ -4,9 +4,12 @@
   width: 100%;
 }
 
+/* Main content */
 .layout-content {
   flex: 1;
-  padding: 20px;
+  padding: 32px;
   overflow-y: auto;
-  background: #f8fafc;
+  background: #f6f8fc;
+  margin-left: 240px; /* 💡 deja espacio para el sidebar fijo */
+  transition: margin-left 0.3s ease;
 }
