@@ -2,6 +2,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
+import Footer from './components/Footer';
 
 // ⚙️ Ajustes globales
 // SettingsProvider is provided in main.jsx; don't wrap again here
@@ -111,6 +112,8 @@ export default function App() {
           </Route>
         )}
       </Routes>
+     
+      <Footer />
     </BrowserRouter>
 
      <SettingsBubble />

@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../api/supabaseClient";
 import "../styles/Sidebar.css";
+
+
 import {
   FaUser,
   FaCalendarAlt,
