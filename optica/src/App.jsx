@@ -24,6 +24,8 @@ import AdminNewAppointment from "./pages/admin/AdminNewAppointment"
 import Exams from "./pages/admin/Exams";
 import CreateExamForm from "./pages/admin/CreateExamForm";
 import AdminReferrals from "./pages/admin/Referrals";
+import Reports from "./pages/admin/Reports";
+
 
 // Especialistas pages
 import SpecialistProfile from "./pages/specialist/Profile";
@@ -74,6 +76,7 @@ export default function App() {
                 <Route path="/admin/exams" element={<Exams />} />
                 <Route path="/admin/create-exam" element={<CreateExamForm />} />
                 <Route path="/admin/referrals" element={<AdminReferrals />} />
+                <Route path="/admin/reports" element={<Reports />} />
                 <Route path="*" element={<Navigate to="/admin/users" replace />} />
               </>
             )}
