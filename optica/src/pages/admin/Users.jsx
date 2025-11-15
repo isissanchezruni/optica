@@ -18,6 +18,7 @@ export default function AdminUsers() {
     address: "",
     document: "",
     observations: "",
+    eps: "",
   };
 
   const [form, setForm] = useState(emptyUser);
@@ -40,7 +41,8 @@ export default function AdminUsers() {
           birthdate,
           address,
           document,
-          observations
+          observations,
+          eps
         )
       `);
 
@@ -56,6 +58,7 @@ export default function AdminUsers() {
         address: u.patients?.address || "",
         document: u.patients?.document || "",
         observations: u.patients?.observations || "",
+        eps: u.patients?.eps || "",
       }));
       setUsers(mapped);
     }
@@ -150,6 +153,7 @@ export default function AdminUsers() {
             address: form.address || null,
             document: form.document || null,
             observations: form.observations || null,
+            eps: form.eps || null,
           },
           { onConflict: "id" }
         );
@@ -297,6 +301,34 @@ export default function AdminUsers() {
                 placeholder="Notas o comentarios del paciente"
                 rows="3"
               />
+
+              <label>EPS</label>
+              <select name="eps" value={form.eps || ""} onChange={handleChange} style={{ display: "block", width: "100%", padding: "8px", margin: "0.5rem 0" }}>
+                <option value="">-- Selecciona EPS --</option>
+                {[
+                  "ALIANSALUD ENTIDAD PROMOTORA DE SALUD S.A.",
+                  "ASOCIACIÓN INDÍGENA DEL CAUCA",
+                  "CAPITAL SALUD",
+                  "CAPRESOCA  EPS",
+                  "COMFENALCO  VALLE  E.P.S.",
+                  "COMPENSAR   E.P.S.",
+                  "COOPERATIVA DE SALUD Y DESARROLLO INTEGRAL ZONA SUR ORIENTAL DE CARTAGENA",
+                  "E.P.S.  FAMISANAR LTDA.",
+                  "E.P.S.  SANITAS S.A.",
+                  "EPS  CONVIDA",
+                  "EPS SERVICIO OCCIDENTAL DE SALUD S.A.",
+                  "EPS Y MEDICINA PREPAGADA SURAMERICANA S.A",
+                  "MALLAMAS",
+                  "NUEVA EPS S.A.",
+                  "PIJAOS SALUD EPSI",
+                  "SALUD TOTAL S.A.  E.P.S.",
+                  "SALUDVIDA S.A. E.P.S",
+                  "SAVIA SALUD EPS",
+                  "ninguna de las anteriores",
+                ].map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
+              </select>
 
               <div className="form-actions">
                 <button

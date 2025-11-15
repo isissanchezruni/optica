@@ -155,8 +155,8 @@ tr:nth-child(even) { background: rgba(15,23,42,0.02); }
 
 /* Badges */
 .status-badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-weight: 600; font-size: .85rem; }
-.status-badge.done { background: #e6ffef; color: var(--success); }
-.status-badge.pending { background: #fff7e6; color: var(--warning); }
+.status-badge.done { background: #27AE60; color: white; }
+.status-badge.pending { background: #E74C3C; color: white; }
 
 /* Sidebar / Layout helpers keep compatibility with existing classes */
 .layout-content { background: transparent; }
@@ -284,8 +284,8 @@ body.dark-mode .sidebar .sidebar-menu li {
 }
 
 /* Small UI elements */
-body.dark-mode .status-badge.pending { background: rgba(255,255,255,0.05); color: #ffeaa7; }
-body.dark-mode .status-badge.done { background: rgba(255,255,255,0.04); color: #8ef7b6; }
+body.dark-mode .status-badge.pending { background: #E74C3C; color: white; }
+body.dark-mode .status-badge.done { background: #27AE60; color: white; }
 
 /* Ensure floating controls remain visible */
 body.dark-mode button[aria-label="Abrir ajustes"],

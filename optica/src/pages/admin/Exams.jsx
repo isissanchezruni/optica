@@ -130,16 +130,68 @@ export default function AdminExams() {
     }
   };
 
+  // Descargar plantilla desde el bucket 'pantilla' en Supabase Storage
+  const downloadTemplate = async () => {
+    // Nombre exacto del archivo en el bucket (según imagen proporcionada)
+    const filename = "prantilla examenes optica.pdf";
+    const bucket = "pantilla";
+    try {
+      // Primero intentar URL pública
+      const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(filename);
+      const publicUrl = publicData?.publicUrl;
+      if (publicUrl) {
+        // Forzar descarga abriendo en nueva pestaña
+        const a = document.createElement("a");
+        a.href = publicUrl;
+        a.download = filename;
+        a.target = "_blank";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        return;
+      }
+
+      // Si no es pública, obtener signed URL y descargar el blob para forzar descarga
+      const { data: signedData, error: signedError } = await supabase.storage.from(bucket).createSignedUrl(filename, 120);
+      if (signedError || !signedData?.signedUrl) throw signedError || new Error("No se pudo generar la URL de descarga");
+
+      const resp = await fetch(signedData.signedUrl);
+      if (!resp.ok) throw new Error("Error al obtener el archivo desde storage");
+      const blob = await resp.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert("Error al descargar la plantilla: " + (err?.message || err));
+    }
+  };
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
         <h1>Gestión de Exámenes</h1>
-        <button
-          onClick={() => navigate("/admin/create-exam")}
-          className="btn btn-primary new-exam-btn"
-        >
-          ➕ Nuevo examen
-        </button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            onClick={downloadTemplate}
+            className="btn btn-ghost"
+            style={{ padding: "8px 12px", fontSize: "0.9rem" }}
+          >
+            📥 Plantilla de examenes
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/create-exam")}
+            className="btn btn-primary new-exam-btn"
+          >
+            ➕ Nuevo examen
+          </button>
+        </div>
       </div>
 
       <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
