@@ -100,50 +100,75 @@ export default function AdminUsers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
-
     if (!selected) {
       alert("Selecciona un paciente para editar");
-      setSaving(false);
       return;
     }
 
-    // 🔹 Actualizar profile
-    const { error: profileErr } = await supabase
-      .from("profiles")
-      .update({
-        full_name: form.full_name,
-        email: form.email,
-        phone: form.phone,
-        role: form.role,
-      })
-      .eq("id", selected);
+    // Validación: todos los campos obligatorios
+    const required = [
+      "full_name",
+      "email",
+      "phone",
+      "role",
+      "document",
+      "birth_date",
+      "address",
+      "observations",
+    ];
 
-    // 🔹 Actualizar paciente
-    const { error: patientErr } = await supabase
-      .from("patients")
-      .upsert(
-        {
-          id: selected,
-          birthdate: form.birth_date || null,
-          address: form.address || null,
-          document: form.document || null,
-          observations: form.observations || null,
-        },
-        { onConflict: "id" }
-      );
+    const missing = required.some((k) => {
+      const v = form[k];
+      return v === undefined || v === null || (typeof v === "string" && v.trim() === "");
+    });
 
-    if (profileErr || patientErr) {
-      console.error(profileErr || patientErr);
-      alert("Error al actualizar paciente");
-    } else {
-      alert("✅ Paciente actualizado correctamente");
-      setSelected(null); // 🔹 Cierra el panel de edición
-      setForm(emptyUser);
-      fetchUsers();
+    if (missing) {
+      alert("es obligatorio llenar todos los campos para actualizar la informacion de este paciente");
+      return;
     }
 
-    setSaving(false);
+    setSaving(true);
+    try {
+      // 🔹 Actualizar profile
+      const { error: profileErr } = await supabase
+        .from("profiles")
+        .update({
+          full_name: form.full_name,
+          email: form.email,
+          phone: form.phone,
+          role: form.role,
+        })
+        .eq("id", selected);
+
+      // 🔹 Actualizar paciente
+      const { error: patientErr } = await supabase
+        .from("patients")
+        .upsert(
+          {
+            id: selected,
+            birthdate: form.birth_date || null,
+            address: form.address || null,
+            document: form.document || null,
+            observations: form.observations || null,
+          },
+          { onConflict: "id" }
+        );
+
+      if (profileErr || patientErr) {
+        console.error(profileErr || patientErr);
+        alert("Error al actualizar paciente");
+      } else {
+        alert("✅ Paciente actualizado correctamente");
+        setSelected(null); // 🔹 Cierra el formulario
+        setForm(emptyUser);
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al actualizar paciente");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <p>Cargando usuarios...</p>;
@@ -159,7 +184,7 @@ export default function AdminUsers() {
 
   return (
     <div className="admin-users-container">
-      <div className="users-list">
+      <div className="users-list card">
         <div className="list-header">
           <h2>Usuarios registrados</h2>
           <div style={{ marginTop: 10 }}>
@@ -168,7 +193,7 @@ export default function AdminUsers() {
               placeholder="Buscar por nombre, documento o correo"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.08)" }}
+              className="search-input"
             />
           </div>
         </div>
@@ -198,7 +223,7 @@ export default function AdminUsers() {
         </ul>
       </div>
 
-      <div className="user-form">
+      <div className="user-form card">
         {selected ? (
           <>
             <h2>Editando paciente</h2>

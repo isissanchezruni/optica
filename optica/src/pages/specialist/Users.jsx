@@ -78,40 +78,65 @@ export default function SpecialistUsers() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selected) return;
-    setSaving(true);
+    // Validación: todos los campos deben estar completos
+    const required = [
+      "full_name",
+      "email",
+      "phone",
+      "document",
+      "birth_date",
+      "address",
+      "observations",
+    ];
 
-    const { error: profileErr } = await supabase
-      .from("profiles")
-      .update({
-        full_name: form.full_name,
-        email: form.email,
-        phone: form.phone,
-      })
-      .eq("id", selected);
+    const missing = required.some((k) => {
+      const v = form[k];
+      return v === undefined || v === null || (typeof v === "string" && v.trim() === "");
+    });
 
-    const { error: patientErr } = await supabase
-      .from("patients")
-      .upsert(
-        {
-          id: selected,
-          birthdate: form.birth_date || null,
-          address: form.address || null,
-          document: form.document || null,
-          observations: form.observations || null,
-        },
-        { onConflict: "id" }
-      );
-
-    if (profileErr || patientErr) {
-      console.error(profileErr || patientErr);
-      alert("Error al actualizar paciente");
-    } else {
-      alert("Paciente actualizado correctamente");
-      setSelected(null); // 🔹 Cierra la edición al guardar
-      fetchUsers();
+    if (missing) {
+      alert("es obligatorio llenar todos los campos para actualizar la informacion de este paciente");
+      return;
     }
 
-    setSaving(false);
+    setSaving(true);
+    try {
+      const { error: profileErr } = await supabase
+        .from("profiles")
+        .update({
+          full_name: form.full_name,
+          email: form.email,
+          phone: form.phone,
+        })
+        .eq("id", selected);
+
+      const { error: patientErr } = await supabase
+        .from("patients")
+        .upsert(
+          {
+            id: selected,
+            birthdate: form.birth_date || null,
+            address: form.address || null,
+            document: form.document || null,
+            observations: form.observations || null,
+          },
+          { onConflict: "id" }
+        );
+
+      if (profileErr || patientErr) {
+        console.error(profileErr || patientErr);
+        alert("Error al actualizar paciente");
+      } else {
+        alert("Paciente actualizado correctamente");
+        setSelected(null); // 🔹 Cierra la edición al guardar
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al actualizar paciente");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <p>Cargando pacientes...</p>;
@@ -127,7 +152,7 @@ export default function SpecialistUsers() {
 
   return (
     <div className="admin-users-container">
-      <div className="users-list">
+      <div className="users-list card">
         <h2>Pacientes registrados</h2>
 
         <div style={{ marginBottom: 12 }}>
@@ -136,7 +161,7 @@ export default function SpecialistUsers() {
             placeholder="Buscar paciente por nombre, documento o correo"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.08)" }}
+            className="search-input"
           />
         </div>
 
@@ -154,7 +179,7 @@ export default function SpecialistUsers() {
         </ul>
       </div>
 
-      <div className="user-form">
+      <div className="user-form card">
         {selected ? (
           <>
             <h2>Editando paciente</h2>

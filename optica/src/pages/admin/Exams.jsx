@@ -205,7 +205,7 @@ export default function AdminExams() {
                 <tr key={exam.id}>
                   <td>{exam.profiles?.full_name || "—"}</td>
                   <td>{exam.specialist_role}</td>
-                  <td>{new Date(exam.scheduled_at).toLocaleString()}</td>
+                  <td>{new Date(exam.scheduled_at).toLocaleString("es-CO", { day: "numeric", month: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}</td>
                   <td>
                     <button
                       className={`status-btn ${exam.performed ? "done" : "pending"}`}

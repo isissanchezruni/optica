@@ -680,4 +680,27 @@ body.dark-mode .auth-container .register-link { color: rgba(230,238,248,0.8); }
 /* Slightly narrower card for patient form to match previous size */
 .create-appointment-card--small { max-width: 500px; }
 
+/* Search input used across lists (Users, Exams, Referrals) */
+.search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(15,23,42,0.06);
+  background: inherit;
+  color: inherit;
+  font: inherit;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+body.dark-mode .btn-delete { color: #ff7b7b; }
+
 
