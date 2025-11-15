@@ -83,18 +83,10 @@ export default function NewAppointment() {
   };
 
   return (
-    <div
-      style={{
-        background: "white",
-        padding: "2rem",
-        borderRadius: "12px",
-        maxWidth: "500px",
-        margin: "2rem auto",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-      }}
-    >
-      <h2>Agendar nueva cita</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="create-appointment-wrapper">
+      <div className="card create-appointment-card create-appointment-card--small">
+        <h2>Agendar nueva cita</h2>
+        <form onSubmit={handleSubmit}>
         <label>Tipo de especialista:</label>
         <select
           name="specialist_role"
@@ -152,7 +144,8 @@ export default function NewAppointment() {
             Cancelar
           </button>
         </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

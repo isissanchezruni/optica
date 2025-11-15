@@ -3,6 +3,7 @@ import { supabase } from "../../api/supabaseClient";
 
 export default function SpecialistUsers() {
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -115,13 +116,32 @@ export default function SpecialistUsers() {
 
   if (loading) return <p>Cargando pacientes...</p>;
 
+  const filteredUsers = users.filter((u) => {
+    if (!search || !search.trim()) return true;
+    const term = search.trim().toLowerCase();
+    const name = (u.full_name || "").toLowerCase();
+    const email = (u.email || "").toLowerCase();
+    const doc = (u.document || "").toLowerCase();
+    return name.includes(term) || email.includes(term) || doc.includes(term);
+  });
+
   return (
     <div className="admin-users-container">
       <div className="users-list">
         <h2>Pacientes registrados</h2>
 
+        <div style={{ marginBottom: 12 }}>
+          <input
+            type="text"
+            placeholder="Buscar paciente por nombre, documento o correo"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid rgba(0,0,0,0.08)" }}
+          />
+        </div>
+
         <ul>
-          {users.map((u) => (
+          {filteredUsers.map((u) => (
             <li
               key={u.id}
               onClick={() => handleEdit(u.id)}

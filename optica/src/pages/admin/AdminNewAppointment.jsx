@@ -68,19 +68,11 @@ export default function AdminNewAppointment() {
   };
 
   return (
-    <div
-      style={{
-        background: "white",
-        padding: "2rem",
-        borderRadius: "12px",
-        maxWidth: "700px",
-        margin: "2rem auto",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h2 style={{ marginBottom: "1rem" }}>Agendar Nueva Cita</h2>
+    <div className="create-appointment-wrapper">
+      <div className="card create-appointment-card">
+        <h2 style={{ marginBottom: "1rem" }}>Agendar Nueva Cita</h2>
 
-      <form onSubmit={createAppointment}>
+        <form onSubmit={createAppointment}>
         <label>Paciente:</label>
         <select
           value={newAppointment.patient_id}
@@ -170,6 +162,7 @@ export default function AdminNewAppointment() {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 }
